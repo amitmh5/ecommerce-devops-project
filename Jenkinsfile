@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -16,13 +20,26 @@ pipeline {
                 }
             }
         }
-       stage('Docker Build') {
+
+        stage('SonarQube Scan') {
+            steps {
+                dir('backend') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh '''
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=ecommerce-backend
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build') {
             steps {
                 dir('backend') {
                     sh 'docker build -t backend:v1 .'
                 }
             }
         }
-
     }
 }
