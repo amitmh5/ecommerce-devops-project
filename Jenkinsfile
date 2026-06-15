@@ -16,6 +16,13 @@ pipeline {
                 }
             }
         }
+       stage('Docker Build') {
+            steps {
+                dir('backend') {
+                    sh 'docker build -t backend:v1 .'
+                }
+            }
+        }
 
     }
 }
