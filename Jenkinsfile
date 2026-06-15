@@ -1,11 +1,18 @@
 pipeline {
     agent any
+
+    tools {
+        maven 'Maven'
+    }
+
     stages {
+
         stage('Checkout') {
             steps {
                 echo 'Source code available from GitHub'
             }
         }
+
         stage('Build Maven') {
             steps {
                 dir('backend') {
@@ -13,6 +20,7 @@ pipeline {
                 }
             }
         }
+
         stage('SonarQube Scan') {
             steps {
                 dir('backend') {
@@ -25,6 +33,7 @@ pipeline {
                 }
             }
         }
+
         stage('Docker Build') {
             steps {
                 dir('backend') {
@@ -32,5 +41,15 @@ pipeline {
                 }
             }
         }
+
+        stage('Trivy Scan') {
+            steps {
+                sh '''
+                export TMPDIR=/opt/trivy-temp
+                trivy image --scanners vuln backend:v1
+                '''
+            }
+        }
+
     }
 }
