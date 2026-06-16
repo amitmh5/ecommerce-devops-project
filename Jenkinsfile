@@ -47,6 +47,27 @@ pipeline {
                 '''
             }
         }
+        stage('Push To ECR') {
+    steps {
+        withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: 'aws-ecr-creds'
+        ]]) {
+
+            sh '''
+            aws ecr get-login-password --region ap-south-1 | \
+            docker login --username AWS --password-stdin \
+            886181574480.dkr.ecr.ap-south-1.amazonaws.com
+
+            docker tag backend:v1 \
+            886181574480.dkr.ecr.ap-south-1.amazonaws.com/backend:v1
+
+            docker push \
+            886181574480.dkr.ecr.ap-south-1.amazonaws.com/backend:v1
+            '''
+        }
+    }
+}
 
     }
 }
