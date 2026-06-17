@@ -68,6 +68,16 @@ pipeline {
         }
     }
 }
+        stage('Deploy To Kubernetes') {
+    steps {
+        dir('backend') {
+            sh '''
+            kubectl apply -f k8s/backend-deployment.yaml
+            kubectl apply -f k8s/backend-service.yaml
+            '''
+        }
+    }
+}
 
     }
 }
