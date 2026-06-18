@@ -61,7 +61,7 @@ pipeline {
             docker login --username AWS --password-stdin \
             886181574480.dkr.ecr.ap-south-1.amazonaws.com
 
-            docker tag backend:v1 \
+            docker tag backend:${BUILD_NUMBER} \
             886181574480.dkr.ecr.ap-south-1.amazonaws.com/backend:v1
 
             docker push \
