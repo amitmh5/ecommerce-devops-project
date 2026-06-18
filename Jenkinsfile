@@ -72,12 +72,13 @@ pipeline {
 }
         stage('Deploy To Kubernetes') {
     steps {
-        dir('backend') {
-            sh '''
-            kubectl apply -f k8s/backend-deployment.yaml
-            kubectl apply -f k8s/backend-service.yaml
-            '''
-        }
+        sh """
+        kubectl set image deployment/backend \
+        backend=886181574480.dkr.ecr.ap-south-1.amazonaws.com/backend:${BUILD_NUMBER} \
+        -n ecommerce
+
+        kubectl rollout status deployment/backend -n ecommerce
+        """
     }
 }
 
