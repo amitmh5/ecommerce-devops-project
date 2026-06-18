@@ -1,6 +1,7 @@
 pipeline {
     agent any
 
+
     stages {
 
         stage('Checkout') {
@@ -16,13 +17,70 @@ pipeline {
                 }
             }
         }
-       stage('Docker Build') {
+
+        stage('SonarQube Scan') {
             steps {
                 dir('backend') {
-                    sh 'docker build -t backend:v1 .'
+                    withSonarQubeEnv('SonarQube') {
+                        sh '''
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=ecommerce-backend
+                        '''
+                    }
                 }
             }
         }
+
+        stage('Docker Build') {
+    steps {
+        dir('backend') {
+            sh '''
+            docker build -t backend:${BUILD_NUMBER} .
+            '''
+        }
+    }
+}
+
+        stage('Trivy Scan') {
+            steps {
+                sh '''
+                export TMPDIR=/opt/trivy-temp
+                trivy image --scanners vuln backend:v1
+                '''
+            }
+        }
+        stage('Push To ECR') {
+    steps {
+        withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: 'aws-ecr-creds'
+        ]]) {
+
+            sh '''
+            aws ecr get-login-password --region ap-south-1 | \
+            docker login --username AWS --password-stdin \
+            886181574480.dkr.ecr.ap-south-1.amazonaws.com
+
+            docker tag backend:${BUILD_NUMBER} \
+            886181574480.dkr.ecr.ap-south-1.amazonaws.com/backend:${BUILD_NUMBER}
+
+            docker push \
+            886181574480.dkr.ecr.ap-south-1.amazonaws.com/backend:${BUILD_NUMBER}
+            '''
+        }
+    }
+}
+        stage('Deploy To Kubernetes') {
+    steps {
+        sh """
+        kubectl set image deployment/backend \
+        backend=886181574480.dkr.ecr.ap-south-1.amazonaws.com/backend:${BUILD_NUMBER} \
+        -n ecommerce
+
+        kubectl rollout status deployment/backend -n ecommerce
+        """
+    }
+}
 
     }
 }
