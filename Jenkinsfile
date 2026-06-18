@@ -62,10 +62,10 @@ pipeline {
             886181574480.dkr.ecr.ap-south-1.amazonaws.com
 
             docker tag backend:${BUILD_NUMBER} \
-            886181574480.dkr.ecr.ap-south-1.amazonaws.com/backend:v1
+            886181574480.dkr.ecr.ap-south-1.amazonaws.com/backend:${BUILD_NUMBER}
 
             docker push \
-            886181574480.dkr.ecr.ap-south-1.amazonaws.com/backend:v1
+            886181574480.dkr.ecr.ap-south-1.amazonaws.com/backend:${BUILD_NUMBER}
             '''
         }
     }
