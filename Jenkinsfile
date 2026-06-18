@@ -32,12 +32,14 @@ pipeline {
         }
 
         stage('Docker Build') {
-            steps {
-                dir('backend') {
-                    sh 'docker build -t backend:v1 .'
-                }
-            }
+    steps {
+        dir('backend') {
+            sh '''
+            docker build -t backend:${BUILD_NUMBER} .
+            '''
         }
+    }
+}
 
         stage('Trivy Scan') {
             steps {
