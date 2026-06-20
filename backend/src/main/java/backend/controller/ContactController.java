@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/contact")
+@CrossOrigin(origins = "*")
 public class ContactController {
 
     @PostMapping
