@@ -1,6 +1,8 @@
 package backend.controller;
 
+import backend.entity.Contact;
 import backend.model.ContactRequest;
+import backend.repository.ContactRepository;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -8,14 +10,24 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class ContactController {
 
+    private final ContactRepository contactRepository;
+
+    public ContactController(ContactRepository contactRepository) {
+        this.contactRepository = contactRepository;
+    }
+
     @PostMapping
     public String submitContact(@RequestBody ContactRequest request) {
 
-        System.out.println("Name: " + request.getName());
-        System.out.println("Email: " + request.getEmail());
-        System.out.println("Phone: " + request.getPhone());
-        System.out.println("Message: " + request.getMessage());
+        Contact contact = new Contact();
 
-        return "Contact request received successfully";
+        contact.setName(request.getName());
+        contact.setEmail(request.getEmail());
+        contact.setPhone(request.getPhone());
+        contact.setMessage(request.getMessage());
+
+        contactRepository.save(contact);
+
+        return "Contact request saved successfully";
     }
 }
