@@ -22,7 +22,7 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://13.201.96.137:30080/contact",
+        "http://13.232.2.153:30080/contact",
         {
           method: "POST",
           headers: {
